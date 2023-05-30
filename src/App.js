@@ -4,29 +4,39 @@ import {useState} from 'react';
 function App() {
   const [movies,setMovies] = useState([]);
   const [isLoading,setLoading] = useState(false);
+  const [error,setError] = useState(null);
   async function fetchHandler() {
     setLoading(true);
+    setError(null);
+    try{
     const response = await fetch('https://swapi.dev/api/films');
+    if(!response.ok){
+      throw new Error('Something went wrong!!');
+    }
     const data = await response.json();
+    
     setMovies(data.results);
     setLoading(false);
-    
+    } catch(error){
+      setError(error.message);
+    }
+    setLoading(false); 
+  }
+  let content = <p>Found no movies</p>
+  if(movies.length > 0){
+    content = movies.map(item => <li>{item.title}</li>)
+  }
+  if(error){
+    content = <p>{error}</p>
+  }
+  if(isLoading){
+    content = <p>Loading...</p>
   }
   return (
     <div className="App">
       <button onClick={() => fetchHandler()}>Fetch Movies</button>
-      <ul>
-        {
-          !isLoading && movies.map(item => <li>{item.title}</li>)
-        }
-        
-      </ul>
-      {
-        isLoading  &&  <p>Loading....</p>
-      }
-      {
-        isLoading && movies.length == 0 && <p>Found no movies</p>
-      }
+     {content}
+      
       
     </div>
   );
