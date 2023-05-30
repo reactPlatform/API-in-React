@@ -1,11 +1,12 @@
 
 import './App.css';
-import {useState} from 'react';
+import {useState,useEffect,useCallback} from 'react';
 function App() {
   const [movies,setMovies] = useState([]);
   const [isLoading,setLoading] = useState(false);
   const [error,setError] = useState(null);
-  async function fetchHandler() {
+  
+  const fetchHandler = useCallback(async () => {
     setLoading(true);
     setError(null);
     try{
@@ -21,7 +22,11 @@ function App() {
       setError(error.message);
     }
     setLoading(false); 
-  }
+  },[]);
+  
+  useEffect(() => {
+    fetchHandler();
+  },[]);
   let content = <p>Found no movies</p>
   if(movies.length > 0){
     content = movies.map(item => <li>{item.title}</li>)
